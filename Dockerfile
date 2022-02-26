@@ -1,17 +1,19 @@
 # youtube-dl-nas Server Dockerfile
 # https://github.com/hyeonsangjeon/youtube-dl-nas.git
 
-FROM python:3-onbuild
+# FROM python:3-onbuild
+FROM python:3.8
 LABEL maintainer="wingnut0310 <wingnut0310@gmail.com>"
 
-# Install ffmpeg.
-#https://unix.stackexchange.com/questions/508724/failed-to-fetch-jessie-backports-repository
-RUN echo "deb [check-valid-until=no] http://cdn-fastly.deb.debian.org/debian jessie main" > /etc/apt/sources.list.d/jessie.list
-RUN echo "deb [check-valid-until=no] http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
-RUN sed -i '/deb http:\/\/deb.debian.org\/debian jessie-updates main/d' /etc/apt/sources.list
-RUN apt-get -o Acquire::Check-Valid-Until=false update
-RUN apt-get install -y libav-tools vim dos2unix && \
-    rm -rf /var/lib/apt/lists/*
+ENV http_proxy 'http://192.168.0.88:8118'
+ENV https_proxy 'http://192.168.0.88:8118'
+
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+  ffmpeg \
+  #libav-tools \
+  dos2unix \
+  && rm -rf /var/lib/apt/lists/*
 
 
 COPY /subber /usr/bin/subber 
@@ -22,7 +24,11 @@ RUN chmod +x /usr/bin/subber && \
      chmod +x /run.sh && \
      dos2unix /run.sh
 
-RUN pip install -U youtube-dl
+
+RUN python3 -m pip install -U youtube-dl
+
+ENV http_proxy ''
+ENV https_proxy ''
 
 EXPOSE 8080
 
