@@ -27,6 +27,12 @@ RUN chmod +x /usr/bin/subber && \
 
 RUN python3 -m pip install -U youtube-dl
 
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY requirements.txt /usr/src/app/
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
+COPY . /usr/src/app
+
 ENV http_proxy ''
 ENV https_proxy ''
 
